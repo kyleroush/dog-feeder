@@ -1,12 +1,12 @@
 const express = require('express')
-// const Gpio = require('pigpio').Gpio
+const Gpio = require('pigpio').Gpio
 const app = express()
 var cron = require('node-cron');
 
 var path = require('path');
 const port = 3000
 
-// const motor = new Gpio(17, {mode: Gpio.OUTPUT}) 
+const motor = new Gpio(17, {mode: Gpio.OUTPUT}) 
 
 var toSkip = false
 
