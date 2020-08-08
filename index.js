@@ -10,7 +10,6 @@ const motor = new Gpio(17, {mode: Gpio.OUTPUT})
 
 var toSkip = false
 
-
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
@@ -21,34 +20,37 @@ app.get('/', (req, res) => {
 })
 app.post('/feed', (req, res) => {
 
-    motor.servoWrite(1000)
-
-    setTimeout(function(){ motor.servoWrite(0) }, req.body.time);
-
+    feed(req.body.time, 1000)
 
     res.json(req.body)
 })
 
 app.post('/skip', (req, res) => {
 
-    // motor.servoWrite(1000)
-
-    // setTimeout(function(){ motor.servoWrite(0) }, 1000);
-
     toSkip = true
-    res.json(req.body)
+    res.json({toSkip})
 })
 
-app.listen(port, () => console.log(`Example app listening at http://localhost:${port}`))
+app.get('/skip', (req, res) => {
+
+    res.json({toSkip})
+})
+
+app.listen(port, () => console.log(`Example app listening at http://localhost:${port}`));
 
  
-cron.schedule('0 8,18,20 * * *', () => {
+const job = cron.schedule('0 8,18,20 * * *', () => {
     if (toSkip) {
-        toSkip =false;
+        toSkip = false;
+        console.log('skipping')
         return;
     }
   
-    motor.servoWrite(1000)
-
-    setTimeout(function(){ motor.servoWrite(0) }, 700);
+    feed(700, 1000)
 });
+
+function feed(time, speed) {
+    motor.servoWrite(speed)
+
+    setTimeout(() => { motor.servoWrite(0) }, time);
+}
